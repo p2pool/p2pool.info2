@@ -1,0 +1,1 @@
+for A in stats blocks payouts users donations difficulty ; do wget http://p2pool.info/$A ; done
