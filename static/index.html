@@ -7,19 +7,19 @@
     <title>Pool Stats - p2pool.info</title>
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
     <!--[if lt IE 9]>
-      <script src="/scripts/html5.js"></script>
+      <script src="scripts/html5.js"></script>
     <![endif]-->
     <!-- Le styles -->
-    <link href="/content/bootstrap.min.css" rel="stylesheet" />
-    <link href="/content/bootstrap-responsive.css" rel="stylesheet" />
-    <link href="/content/p2pool.css" rel="stylesheet" />
+    <link href="content/bootstrap.min.css" rel="stylesheet" />
+    <link href="content/bootstrap-responsive.css" rel="stylesheet" />
+    <link href="content/p2pool.css" rel="stylesheet" />
 </head>
 <body>
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
-                <a href="/" class="homelink">
-                    <img class="pull-left" src="/content/logo.png" alt="p2pool" /></a>
+                <a href="index.html" class="homelink">
+                    <img class="pull-left" src="content/logo.png" alt="p2pool" /></a>
                 <ul class="nav">
                     <li><a href="https://en.bitcoin.it/wiki/P2Pool">About</a></li>
                     <li><a href="https://bitcointalk.org/index.php?topic=18313.0">Forum</a></li>
@@ -64,7 +64,7 @@
                             (7 days, 30 days, 90 days): </span><span class="luck" data-bind="text: blocksLoaded() ? $root.formatPercent(sevenDays()) : '...', css: {green: sevenDays() >= 100, red: sevenDays() < 100}">
                             </span><span class="luck" data-bind="text: blocksLoaded() ? $root.formatPercent(thirtyDays())  : '...', css: {green: thirtyDays() >= 100, red: thirtyDays() < 100}">
                             </span><span class="luck" data-bind="text: blocksLoaded() ? $root.formatPercent(ninetyDays())  : '...', css: {green: ninetyDays() >= 100, red: ninetyDays() < 100}">
-                            </span><a class="hide" href="/luck/" data-bind="css: {hide: !blocksLoaded()}">(view
+                            </span><a class="hide" href="luck/" data-bind="css: {hide: !blocksLoaded()}">(view
                                 luck charts)</a>
                     </div>
                     <div class="intro">
@@ -227,16 +227,16 @@
                 </div>
             </div>
             <audio id="audio-newblock">
-                <source src="/content/newblock.mp3" type="audio/mp3" />
+                <source src="content/newblock.mp3" type="audio/mp3" />
             </audio>
             <!-- /container -->
-            <script type="text/javascript" src="/scripts/jquery-1.7.1.min.js"></script>
-            <script type="text/javascript" src="/scripts/store-json2.min.js"></script>
-            <script type="text/javascript" src="/scripts/knockout.js"></script>
-            <script type="text/javascript" src="/scripts/knockout.mapping-latest.js"></script>
-            <script type="text/javascript" src="/scripts/highstock.src.js"></script>
-            <script type="text/javascript" src="/scripts/bootstrap.min.js"></script>
-            <script type="text/javascript" src="/scripts/p2pool.js"></script>
+            <script type="text/javascript" src="scripts/jquery-1.7.1.min.js"></script>
+            <script type="text/javascript" src="scripts/store-json2.min.js"></script>
+            <script type="text/javascript" src="scripts/knockout.js"></script>
+            <script type="text/javascript" src="scripts/knockout.mapping-latest.js"></script>
+            <script type="text/javascript" src="scripts/highstock.src.js"></script>
+            <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+            <script type="text/javascript" src="scripts/p2pool.js"></script>
         </div>
     </div>
 </body>
