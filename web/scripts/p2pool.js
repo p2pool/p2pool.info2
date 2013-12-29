@@ -416,7 +416,7 @@ $(function () {
         }
     };
 
-    $.get("data/stats", null, function (result) {
+    $.get("data/stats?anticache="+new Date().getTime(), null, function (result) {
 
         var rates = result.rates;
         latestRateTimestamp = rates[rates.length - 1][0];
@@ -516,7 +516,7 @@ $(function () {
 
         setInterval(function () {
             try {
-                $.get("data/stats?from=" + latestRateTimestamp, null, function (data) {
+                $.get("data/stats_recent?from=" + latestRateTimestamp + "+anticache="+new Date().getTime(), null, function (data) {
                     if (data.rates.length > 0) {
                         var rates = data.rates;
                         var users = data.users;
@@ -551,14 +551,14 @@ $(function () {
             }
         }, 120000);
 
-        $.get("data/blocks", null, function (data) {
+        $.get("data/blocks?anticache="+new Date().getTime(), null, function (data) {
             ko.mapping.fromJS(data, model.blocks);
             model.blocksLoaded(true);
             model.skipFade = false;
             setInterval(function () {
                 try {
                     var from = model.LastBlockHeight();
-                    $.get("data/blocks?from=" + from, null, function (data) {
+                    $.get("data/blocks_recent?from=" + from + "+anticache="+new Date().getTime(), null, function (data) {
                         if (data.length > 0) {
                             if (model.playSound()) {
                                 var audio = $("#audio-newblock")[0];
@@ -588,7 +588,7 @@ $(function () {
 
         function updatePayouts() {
             try {
-                $.get("data/payouts", null, function (data) {
+                $.get("data/payouts?anticache="+new Date().getTime(), null, function (data) {
                     model.payoutsLoaded(true);
                     ko.mapping.fromJS(data, model.payouts);
                 }, 'json');
@@ -601,7 +601,7 @@ $(function () {
 
         function updateUsers() {
             try {
-                $.get("data/users", null, function (data) {
+                $.get("data/users?anticache="+new Date().getTime(), null, function (data) {
                     model.usersLoaded(true);
                     ko.mapping.fromJS(data, model.users);
                 }, 'json');
@@ -614,7 +614,7 @@ $(function () {
 
         function updateDonations() {
             try {
-                $.getJSON("data/donations", null, function (data) {
+                $.getJSON("data/donations?anticache="+new Date().getTime(), null, function (data) {
                     model.donationsLoaded(true);
                     ko.mapping.fromJS(data, model.donations);
                 });
@@ -627,7 +627,7 @@ $(function () {
 
         function updateDifficulty() {
             try {
-                $.get("data/difficulty", null, function (result) {
+                $.get("data/difficulty?anticache="+new Date().getTime(), null, function (result) {
                     model.difficulty(result);
                 }, 'json');
             }
