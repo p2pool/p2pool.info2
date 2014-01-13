@@ -1,1 +1,4 @@
-for A in stats blocks payouts users donations difficulty ; do wget http://p2pool.info/$A ; done
+for A in stats payouts users donations difficulty
+	do wget http://p2pool.info/$A
+done
+wget http://p2pool.info/blocks?all=true -O blocks

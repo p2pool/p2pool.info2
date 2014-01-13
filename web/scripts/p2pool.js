@@ -20,6 +20,10 @@ function ViewModel() {
         create: function (options) {
             var block = {};
             ko.mapping.fromJS(options.data, {}, block);
+            
+            block.ExpectedShares = ko.computed(function () {
+                return block.Difficulty();
+            });
 
             block.When = ko.computed(function () {
                 model.ticks();
@@ -552,6 +556,20 @@ $(function () {
         }, 120000);
 
         $.get("data/blocks?anticache="+new Date().getTime(), null, function (data) {
+            data.sort(function(a, b) { return b.Timestamp - a.Timestamp; });
+            for(var i = 0; i < data.length; i++) {
+                var block = data[i];
+                
+                if(i == data.length - 1) {
+                    block.RoundDuration = 0;
+                } else {
+                    var prior_block = data[i+1];
+                    
+                    block.RoundDuration = block.Timestamp - prior_block.Timestamp;
+                }
+            }
+            data = data.slice(0, 20);
+            
             ko.mapping.fromJS(data, model.blocks);
             model.blocksLoaded(true);
             model.skipFade = false;

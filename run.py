@@ -201,7 +201,7 @@ def main():
     blocks = list(old_blocks)
     blocks_dict = dict((block['Id'], block) for block in blocks)
     assert len(blocks_dict) == len(blocks)
-    for block_data in list((yield get_blocks(b, 10))) + list((yield get_blocks2(10))):
+    for block_data in list((yield get_blocks(b, 100))) + list((yield get_blocks2(100))):
         block = block_data['block']
         
         txouts = block['txs'][0]['tx_outs']
@@ -222,15 +222,18 @@ def main():
                 PrevBlock='%064x' % block['header']['previous_block'],
                 GenerationTxHash='%064x' % block_data['gentx_hash'],
                 BlockHeight=block_data['height'],
-                Difficulty=bitcoin_data.target_to_difficulty(block['header']['bits']),
-                IsOrphaned=None,
+                Difficulty=bitcoin_data.target_to_difficulty(block['header']['bits'].target),
+                Timestamp=block['header']['timestamp'],
+                IsOrphaned=None, # XXX
             )
             blocks.append(x)
             blocks_dict[hash_str] = x
-    blocks.sort(key=lambda x: x['BlockHeight'])
+    blocks.sort(key=lambda x: -x['Timestamp'])
 
     # write
 
+    _atomic_write(os.path.join(datadir, 'blocks_5'), json.dumps(blocks[:5]))
+    _atomic_write(os.path.join(datadir, 'blocks_100'), json.dumps(blocks[:100]))
     _atomic_write(os.path.join(datadir, 'blocks'), json.dumps(blocks))
     _atomic_write(os.path.join(datadir, 'difficulty'), json.dumps(difficulty))
     #_atomic_write(os.path.join(datadir, 'donations'), json.dumps(donations))
