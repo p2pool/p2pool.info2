@@ -201,7 +201,7 @@ def main():
     blocks = list(old_blocks)
     blocks_dict = dict((block['Id'], block) for block in blocks)
     assert len(blocks_dict) == len(blocks)
-    for block_data in list((yield get_blocks(b, 100))) + list((yield get_blocks2(100))):
+    for block_data in list((yield get_blocks(b, 400))):# + list((yield get_blocks2(200))):
         block = block_data['block']
         
         txouts = block['txs'][0]['tx_outs']

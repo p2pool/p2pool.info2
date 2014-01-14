@@ -1,0 +1,105 @@
+<html>
+<head>
+<script>
+
+function bisect_right(a, x, value_func) {
+    if(!value_func) {
+        value_func = function(x) { return x }
+    }
+    
+    // port of Python's bisect.bisect_right
+    var lo = 0, hi = a.length
+    
+    while(lo < hi) {
+        var mid = Math.floor((lo+hi)/2)
+        if(x < value_func(a[mid])) hi = mid
+        else lo = mid+1
+    }
+    return lo
+}
+
+function cumulate(points) {
+    var res = []
+    
+    var total = 0
+    
+    for(var i = 0; i < points.length; i++) {
+        var point = points[i]
+        
+        var time = point[0]
+        var value = point[1]
+        
+        res.push([time, total, value])
+        
+        if(i != points.length - 1) {
+            var next_point = points[i + 1]
+            
+            var next_time = next_point[0]
+            var next_value = next_point[1]
+            
+            total += (value + next_value)/2 * (next_time - time)
+        }
+    }
+    
+    return res
+}
+
+function lerp(a, b, x) {
+    return a*(1-x) + b*x
+}
+
+function unlerp(a, b, x) {
+    return (x - a)/(b - a)
+}
+
+function antiderivative(cumulates, x) {
+    if(x < cumulates[0][0]) throw "antiderivative called with too-low x"
+    if(x > cumulates[cumulates.length-1][0]) throw "antiderivative called with too-high x"
+    
+    var i = bisect_right(cumulates, x,
+        function(cumulate) { return cumulate[0] })
+    
+    if(i == cumulates.length) i--
+    
+    var left_cumulate = cumulates[i-1]
+    var right_cumulate = cumulates[i]
+    
+    if(left_cumulate[0] > x || right_cumulate[0] < x) throw "assertion failed"
+    
+    var p = unlerp(left_cumulate[0], right_cumulate[0], x)
+    
+    return left_cumulate[1] +
+        (
+            left_cumulate[2] +
+            lerp(left_cumulate[2], right_cumulate[2], p)
+        )/2 * (
+            lerp(left_cumulate[0], right_cumulate[0], p) -
+            left_cumulate[0]
+        )
+}
+
+function integrate(cumulates, start, end) {
+    return antiderivative(cumulates, end) -
+           antiderivative(cumulates, start)
+}
+
+
+
+//alert(bisect_right([1, 3, 5, 7, 9], 5))
+
+var data = [
+    [1, 1],
+    [2, 3],
+    [3, 2],
+    [5, 6]]
+var c = cumulate(data)
+
+//alert(JSON.stringify(c))
+
+alert(integrate(c, 1, 5))
+
+</script>
+</head>
+<body>
+</body>
+</html>

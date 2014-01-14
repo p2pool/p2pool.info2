@@ -8,6 +8,89 @@
 /*jshint browser: true, jquery: true */
 /*global ko: false, store: false, Highcharts: false*/
 
+function bisect_right(a, x, value_func) {
+    if(!value_func) {
+        value_func = function(x) { return x }
+    }
+    
+    // port of Python's bisect.bisect_right
+    var lo = 0, hi = a.length
+    
+    while(lo < hi) {
+        var mid = Math.floor((lo+hi)/2)
+        if(x < value_func(a[mid])) hi = mid
+        else lo = mid+1
+    }
+    return lo
+}
+
+function cumulate(points) {
+    var res = []
+    
+    var total = 0
+    
+    for(var i = 0; i < points.length; i++) {
+        var point = points[i]
+        
+        var time = point[0]
+        var value = point[1]
+        
+        res.push([time, total, value])
+        
+        if(i != points.length - 1) {
+            var next_point = points[i + 1]
+            
+            var next_time = next_point[0]
+            var next_value = next_point[1]
+            
+            total += (value + next_value)/2 * (next_time - time)
+        }
+    }
+    
+    return res
+}
+
+function lerp(a, b, x) {
+    return a*(1-x) + b*x
+}
+
+function unlerp(a, b, x) {
+    return (x - a)/(b - a)
+}
+
+function antiderivative(cumulates, x) {
+    if(x < cumulates[0][0]) throw "antiderivative called with too-low x"
+    if(x > cumulates[cumulates.length-1][0]) throw "antiderivative called with too-high x"
+    
+    var i = bisect_right(cumulates, x,
+        function(cumulate) { return cumulate[0] })
+    
+    if(i == cumulates.length) i--
+    
+    var left_cumulate = cumulates[i-1]
+    var right_cumulate = cumulates[i]
+    
+    if(left_cumulate[0] > x || right_cumulate[0] < x) throw "assertion failed"
+    
+    var p = unlerp(left_cumulate[0], right_cumulate[0], x)
+    
+    return left_cumulate[1] +
+        (
+            left_cumulate[2] +
+            lerp(left_cumulate[2], right_cumulate[2], p)
+        )/2 * (
+            lerp(left_cumulate[0], right_cumulate[0], p) -
+            left_cumulate[0]
+        )
+}
+
+function integrate(cumulates, start, end) {
+    return antiderivative(cumulates, end) -
+           antiderivative(cumulates, start)
+}
+
+
+
 function ViewModel() {
     var self = this;
     var model = self;
@@ -556,19 +639,27 @@ $(function () {
         }, 120000);
 
         $.get("data/blocks?anticache="+new Date().getTime(), null, function (data) {
+            var c = cumulate(result.rates);
+            
             data.sort(function(a, b) { return b.Timestamp - a.Timestamp; });
             for(var i = 0; i < data.length; i++) {
                 var block = data[i];
                 
                 if(i == data.length - 1) {
                     block.RoundDuration = 0;
+                    block.ActualShares = 0;
                 } else {
                     var prior_block = data[i+1];
                     
                     block.RoundDuration = block.Timestamp - prior_block.Timestamp;
+                    try {
+                        block.ActualShares = integrate(c, prior_block.Timestamp*1e3, block.Timestamp*1e3)/1e3 * 1e9 / 4295032833;
+                    } catch(err) {
+                        block.ActualShares = 0;
+                    }
                 }
             }
-            data = data.slice(0, 20);
+            data = data.slice(0, 500);
             
             ko.mapping.fromJS(data, model.blocks);
             model.blocksLoaded(true);
