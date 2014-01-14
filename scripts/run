@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python run.py web/data/ http://127.0.0.1:9332/ http://127.0.0.1:8332/ bitcoinrpc `cat ~/.bitcoin/password`

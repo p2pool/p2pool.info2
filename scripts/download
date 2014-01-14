@@ -1,3 +1,10 @@
+#!/bin/bash
+
+rm -fr web/data
+mkdir -p web/data
+
+cd web/data
+
 for A in stats payouts users donations difficulty
 	do wget http://p2pool.info/$A
 done

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+TMPFILE=`mktemp`
+json_pp -json_opt canonical,pretty,allow_nonref < $1 > $TMPFILE
+cat $TMPFILE > $1

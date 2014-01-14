@@ -1,0 +1,3 @@
+#!/bin/bash
+
+twistd --pidfile=/tmp/twistd.pid -n web --path web/
