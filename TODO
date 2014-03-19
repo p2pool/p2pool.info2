@@ -1,0 +1,9 @@
+* Allow multiple P2Pool nodes.
+* Gracefully handle failure of any of block sources.
+* Fix auto-updating.
+
+Hardfork
+--------
+
+* Store all (including orphaned) blocks in the P2Pool sharechain so there's
+  no need to rely on blockchain.info.
