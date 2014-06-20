@@ -47,21 +47,19 @@ def _atomic_write(filename, data):
         os.rename(filename + '.new', filename)
 
 @defer.inlineCallbacks
-def get_blocks(b, n):
+def get_blocks(b, n, callback):
     h = yield b.rpc_getbestblockhash()
-    res = []
     for i in xrange(n):
         print 'getting block', i, 'out of', n, 'back'
         block_data = yield b.rpc_getblock(h, False)
         block_data2 = yield b.rpc_getblock(h)
         block = bitcoin_data.block_type.unpack(block_data.decode('hex'))
-        res.append(dict(
+        callback(dict(
             block=block,
             height=block_data2['height'],
             gentx_hash=bitcoin_data.hash256(bitcoin_data.tx_type.pack(block['txs'][0])),
         ))
         h = '%064x' % (block['header']['previous_block'],)
-    defer.returnValue(res)
 
 def blockchain(cmd):
     return client.getPage('http://blockchain.info/' + cmd).addCallback(json.loads)
@@ -209,16 +207,16 @@ def main():
     blocks = list(old_blocks)
     blocks_dict = dict((block['Id'], block) for block in blocks)
     assert len(blocks_dict) == len(blocks)
-    for block_data in list((yield get_blocks(b, 400))):# + list((yield get_blocks2(200))):
+    def handle_block(block_data):
         block = block_data['block']
         
         txouts = block['txs'][0]['tx_outs']
         
-        if len(txouts) < 25: continue
-        if not txouts[-1]['script'].startswith('\x6a'): continue
-        if len(txouts[-1]['script']) < 33: continue
-        if txouts[-1]['value'] != 0: continue
-        if txouts[-2]['script'] != p2pool_data.DONATION_SCRIPT: continue
+        if len(txouts) < 25: return
+        if not txouts[-1]['script'].startswith('\x6a'): return
+        if len(txouts[-1]['script']) < 33: return
+        if txouts[-1]['value'] != 0: return
+        if txouts[-2]['script'] != p2pool_data.DONATION_SCRIPT: return
         
         hash_str = '%064x' % bitcoin_data.hash256(bitcoin_data.block_header_type.pack(block['header']))
         print hash_str
@@ -236,6 +234,7 @@ def main():
             )
             blocks.append(x)
             blocks_dict[hash_str] = x
+    yield get_blocks(b, 40000, handle_block)
     blocks.sort(key=lambda x: -x['Timestamp'])
 
     # write
