@@ -1,3 +1,5 @@
 #!/bin/bash
 
-python run.py web/data/ http://127.0.0.1:9332/ http://127.0.0.1:8332/ bitcoinrpc `cat ~/.bitcoin/password`
+python run.py web/data/ \
+    https://127.0.0.1:8332/ bitcoinrpc `cat ~/.bitcoin/password` \
+    http://add-p2pool-servers-here:9332

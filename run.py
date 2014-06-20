@@ -3,10 +3,10 @@ from __future__ import division
 import sys
 import os
 import json
-import urllib
 import time
 import errno
 import base64
+import traceback
 
 from twisted.internet import defer, reactor
 from twisted.web import client
@@ -51,6 +51,7 @@ def get_blocks(b, n):
     h = yield b.rpc_getbestblockhash()
     res = []
     for i in xrange(n):
+        print 'getting block', i, 'out of', n, 'back'
         block_data = yield b.rpc_getblock(h, False)
         block_data2 = yield b.rpc_getblock(h)
         block = bitcoin_data.block_type.unpack(block_data.decode('hex'))
@@ -128,18 +129,25 @@ def get_blocks2(n):
 @defer.inlineCallbacks
 def main():
     datadir = sys.argv[1]
-    p2pool_base_url = sys.argv[2]
-    b = jsonrpc.HTTPProxy(sys.argv[3], dict(
+    b = jsonrpc.HTTPProxy(sys.argv[2], dict(
         Authorization='Basic ' + base64.b64encode(
-            sys.argv[4] + ':' + sys.argv[5]
+            sys.argv[3] + ':' + sys.argv[4]
         ),
     ), timeout=30)
+    p2pool_base_urls = sys.argv[5:]
 
+    @defer.inlineCallbacks
     def get(blah):
-        f = urllib.urlopen(p2pool_base_url.rstrip('/') + '/' + blah)
-        d = f.read()
-        f.close()
-        return json.loads(d)
+        for p2pool_base_url in util_math.shuffled(p2pool_base_urls):
+            url = p2pool_base_url.rstrip('/') + '/' + blah
+            print 'trying', url
+            try:
+                d = yield client.getPage(url)
+            except Exception:
+                traceback.print_exc()
+            else:
+                defer.returnValue(json.loads(d))
+        raise ValueError('no good p2pool servers')
 
     # read old
 
@@ -156,10 +164,10 @@ def main():
     # update
     #print stats
 
-    web_local_stats = get('local_stats')
-    web_global_stats = get('global_stats')
-    web_users = get('users')
-    web_current_payouts = get('current_payouts')
+    web_local_stats = yield get('local_stats')
+    web_global_stats = yield get('global_stats')
+    web_users = yield get('users')
+    web_current_payouts = yield get('current_payouts')
 
     difficulty = bitcoin_data.target_to_difficulty(
         bitcoin_data.average_attempts_to_target(web_local_stats['attempts_to_block']))
