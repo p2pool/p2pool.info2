@@ -234,7 +234,7 @@ def main():
             )
             blocks.append(x)
             blocks_dict[hash_str] = x
-    yield get_blocks(b, 40000, handle_block)
+    yield get_blocks(b, 400, handle_block)
     blocks.sort(key=lambda x: -x['Timestamp'])
 
     # write
