@@ -5,7 +5,6 @@ mkdir -p web/data
 
 cd web/data
 
-for A in stats payouts users donations difficulty
-	do wget http://p2pool.info/$A
+for A in stats payouts users donations difficulty blocks
+	do wget http://p2pool.info/data/$A
 done
-wget http://p2pool.info/blocks?all=true -O blocks
