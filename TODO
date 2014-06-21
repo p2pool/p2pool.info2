@@ -1,4 +1,3 @@
-* Allow multiple P2Pool nodes.
 * Gracefully handle failure of any of block sources.
 * Fix auto-updating.
 
