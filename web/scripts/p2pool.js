@@ -569,8 +569,10 @@ $(function () {
                         y: 4,
                         align: 'right',
                         formatter: function () {
-                        	if (this.value > 1000) {
-                        		return (this.value / 1000) + " TH/s";
+                        	if (this.value > 1e9) {
+                        		return (this.value / 1e9) + " PH/s";
+                        	} else if (this.value > 1e3) {
+                        		return (this.value / 1e3) + " TH/s";
                         	} else {
                         		return (this.value) + " GH/s";
                         	}
